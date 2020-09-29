@@ -1,31 +1,21 @@
-import React, { Component } from 'react';
+import React, { Component, useCallback, useContext, useState, useEffect, useReducer } from 'react';
 import { render } from 'react-dom';
 import Hello from './Hello';
+import { getStore, Store } from './logic';
 import './style.css';
 
-interface AppProps { }
-interface AppState {
-  name: string;
-}
+const store = getStore();
 
-class App extends Component<AppProps, AppState> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: 'React'
-    };
-  }
-
-  render() {
-    return (
-      <div>
-        <Hello name={this.state.name} />
-        <p>
-          Start editing to see some magic happen :)
-        </p>
-      </div>
-    );
-  }
+const App: React.FunctionComponent = ()=>{
+  
+  
+  return(
+    <div className="boxContainer">
+      {
+        
+      }
+    </div>
+  )
 }
 
 render(<App />, document.getElementById('root'));
