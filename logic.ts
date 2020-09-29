@@ -1,8 +1,15 @@
+import { Evt, NonPostableEvt, ToPostableEvt } from "evt";
+
+
 
 export type Store = Readonly<{
   boxes: Array<"o" | "x" | "">;
-  naughtOrCross: "o" | "x";
+  currentPlayerSymbol: "o" | "x";
   play: (index: number)=> void;
+  isGameWon: boolean;
+
+  evtPlayed: NonPostableEvt<Readonly<Store["boxes"][number]>>;
+
 }>
 
 export function getStore(){
@@ -11,19 +18,28 @@ export function getStore(){
     boxes.push("");
   }
 
-  let naughtOrCross: Store["naughtOrCross"] = "o";
+  let currentPlayerSymbol: Store["currentPlayerSymbol"] = "o";
+  let isGameWon = false;
 
-  const store: Store = {
+  const store: ToPostableEvt<Store>= {
     boxes,
-    naughtOrCross,
+    currentPlayerSymbol,
     "play": index =>{
-      if(boxes[index] !== ""){
+      if(boxes[index] !== "" || isGameWon){
         return;
       }
 
-      boxes[index] = naughtOrCross === "o" ? "o" : "x";
-      naughtOrCross = naughtOrCross === "o" ? "x" : "o";
-    }
+      boxes[index] = currentPlayerSymbol === "o" ? "o" : "x";
+      currentPlayerSymbol = currentPlayerSymbol === "o" ? "x" : "o";
+
+      store.evtPlayed.post(boxes[index]);
+    },
+    
+    isGameWon,
+
+    "evtPlayed": new Evt()
   }
+
+  return store;
 
 }
