@@ -13,9 +13,28 @@ export type Store = Readonly<{
 }>
 
 export function getStore(){
+  
   const boxes: Store["boxes"] = [];
   for(let i = 0; i < 9; i++){
     boxes.push("");
+  }
+
+  const getHorisontalStreek = (boxes: Store["boxes"], index: 0 | 1 | 2 | 3 | 6)=>{
+    let streek: Store["boxes"] = [];
+
+    for(let i = index; i < index + 3; i++){
+      streek.push(boxes[i]);
+    }
+
+    return streek;
+    
+  }
+
+  const determineIfGameWon = (boxes: Store["boxes"])=>{
+
+    
+    
+
   }
 
   let currentPlayerSymbol: Store["currentPlayerSymbol"] = "o";
@@ -31,6 +50,7 @@ export function getStore(){
 
       boxes[index] = currentPlayerSymbol === "o" ? "o" : "x";
       currentPlayerSymbol = currentPlayerSymbol === "o" ? "x" : "o";
+      
 
       store.evtPlayed.post(boxes[index]);
     },
