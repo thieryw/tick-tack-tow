@@ -24,9 +24,10 @@ export const App: React.FunctionComponent<{
   return(
     <div className="boxContainer">
       {
-        store.boxes.map(box => <Box 
+        store.boxes.map((box, index) => <Box 
+          key={index}
           box={box} 
-          currentPlayerSymbol={store.currentPlayerSymbol} 
+          currentPlayerSymbol={store.currentPlayerMark} 
           play={store.play}
           />
         )

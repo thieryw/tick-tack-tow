@@ -10,27 +10,22 @@ import {useEvt} from "evt/hooks";
 export const Box: React.FunctionComponent<{
   box: Store["boxes"][number];
   play: Store["play"];
-  currentPlayerSymbol: Store["currentPlayerSymbol"];
+  currentPlayerSymbol: Store["currentPlayerMark"];
   
   
 }> = (props)=>{
 
   const {box, play, currentPlayerSymbol} = props;
-  
+  const [isBoxLoading, setIsBoxLoading] = useState(false);
 
-
-
-  
-
- 
-  
-
+  const onBoxClick = (Params: Parameters<Store["play"]>)=>{
+    setIsBoxLoading(true);
+    
+  }
 
   return(
 
-    <div onClick={useCallback(()=> 
-      play({"coordinates": box.coordinates, "mark": currentPlayerSymbol}),
-       [box])} 
+    <div onClick={} 
        className="box">
        {box.mark}
     </div>

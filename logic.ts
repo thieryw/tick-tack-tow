@@ -23,8 +23,8 @@ export type Store = Readonly<{
           Box, Box, Box];
 
   getMarkAtCoordinates: (coordinates: Coordinates) => Mark | undefined;
-  currentPlayerSymbol: Mark;
-  play: (params: {coordinates: Coordinates; mark: Mark})=> void;
+  currentPlayerMark: Mark;
+  play: (params: {coordinates: Coordinates; mark: Mark})=> Promise<void>;
   isGameWon: boolean;
 
   evtPlayed: NonPostableEvt<Parameters<Store["play"]>[0]>;
@@ -80,12 +80,14 @@ export function getStore(){
   ];
 
 
-
+  const simulateNetworkDelay = (ms: number)=>{
+    return new Promise<void>(resolve=> setTimeout(resolve, ms));
+  }
  
 
   
 
-  let currentPlayerSymbol: Mark = "o";
+  let currentPlayerMark: Mark = "o";
 
   let isGameWon: false;
 
@@ -105,12 +107,12 @@ export function getStore(){
       
     },
 
-    currentPlayerSymbol,
+    currentPlayerMark,
 
     isGameWon,
     "evtPlayed": new Evt(),
-    "play": params =>{
-
+    "play": async params =>{
+      await simulateNetworkDelay(300);
       if(isGameWon){
         return;
       }
@@ -119,8 +121,8 @@ export function getStore(){
       
       boxes.forEach((box, index)=>{
         if(box.coordinates === params.coordinates && box.mark === undefined){
-          boxes[index].mark = currentPlayerSymbol;
-          currentPlayerSymbol = currentPlayerSymbol === "o" ? "x" : "o";
+          boxes[index].mark = currentPlayerMark;
+          currentPlayerMark = currentPlayerMark === "o" ? "x" : "o";
           
           return;
         }
