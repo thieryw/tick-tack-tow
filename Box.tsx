@@ -18,17 +18,24 @@ export const Box: React.FunctionComponent<{
   const {box, play, currentPlayerSymbol} = props;
   const [isBoxLoading, setIsBoxLoading] = useState(false);
 
-  const onBoxClick = (Params: Parameters<Store["play"]>)=>{
+  const onBoxClick = useCallback(()=>{
+    if(box.mark !== undefined){
+      return;
+    }
     setIsBoxLoading(true);
+    play({"coordinates": box.coordinates, "mark": currentPlayerSymbol}).then(()=>{
+      setIsBoxLoading(false);
+    });
     
-    
-  }
+  },[isBoxLoading]);
 
   return(
 
-    <div onClick={} 
+    <div onClick={onBoxClick} 
        className="box">
-       {box.mark}
+       {
+         isBoxLoading ? "..." : box.mark
+       }
     </div>
     
   )

@@ -25,7 +25,10 @@ export type Store = Readonly<{
   getMarkAtCoordinates: (coordinates: Coordinates) => Mark | undefined;
   currentPlayerMark: Mark;
   play: (params: {coordinates: Coordinates; mark: Mark})=> Promise<void>;
-  isGameWon: boolean;
+  gameStatus: {
+    isGameWon: boolean;
+    winnerMark: Mark | undefined;
+  };
 
   evtPlayed: NonPostableEvt<Parameters<Store["play"]>[0]>;
 
@@ -89,7 +92,17 @@ export function getStore(){
 
   let currentPlayerMark: Mark = "o";
 
-  let isGameWon: false;
+  let gameStatus: Store["gameStatus"] = {
+    "isGameWon": false,
+    "winnerMark": undefined
+  }
+
+  
+
+  const getGameStatus = (boxes: Store["boxes"]): Store["gameStatus"] => {
+    
+    
+  }
 
 
   const store: ToPostableEvt<Store> = {
@@ -109,16 +122,18 @@ export function getStore(){
 
     currentPlayerMark,
 
-    isGameWon,
+    gameStatus,
+
     "evtPlayed": new Evt(),
+    
     "play": async params =>{
+      
       await simulateNetworkDelay(300);
-      if(isGameWon){
+      
+      if(gameStatus.isGameWon){
         return;
       }
 
-    
-      
       boxes.forEach((box, index)=>{
         if(box.coordinates === params.coordinates && box.mark === undefined){
           boxes[index].mark = currentPlayerMark;
@@ -126,12 +141,18 @@ export function getStore(){
           
           return;
         }
-      })
+      });
+
+    
+
+
 
       
       store.evtPlayed.post(params);
       
-    }
+    },
+
+    
 
 
 
