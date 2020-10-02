@@ -14,7 +14,9 @@ export const App: React.FunctionComponent<{
   const {store} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
   
-  
+  useEvt(ctx =>{
+    store.evtPlayed.attach(ctx, () => forceUpdate());
+  },[store]);
 
 
   
@@ -22,8 +24,7 @@ export const App: React.FunctionComponent<{
   return(
     <div className="boxContainer">
       {
-        store.boxes.map(box => 
-          <Box 
+        store.boxes.map(box => <Box 
           box={box} 
           currentPlayerSymbol={store.currentPlayerSymbol} 
           play={store.play}

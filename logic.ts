@@ -27,7 +27,7 @@ export type Store = Readonly<{
   play: (params: {coordinates: Coordinates; mark: Mark})=> void;
   isGameWon: boolean;
 
-  evtPlayed: NonPostableEvt<Parameters<Store["play"]>>;
+  evtPlayed: NonPostableEvt<Parameters<Store["play"]>[0]>;
 
 
 
@@ -110,15 +110,25 @@ export function getStore(){
     isGameWon,
     "evtPlayed": new Evt(),
     "play": params =>{
+
+      if(isGameWon){
+        return;
+      }
+
+    
       
       boxes.forEach((box, index)=>{
-        if(box.coordinates === params.coordinates && box.mark !== undefined){
+        if(box.coordinates === params.coordinates && box.mark === undefined){
           boxes[index].mark = currentPlayerSymbol;
+          currentPlayerSymbol = currentPlayerSymbol === "o" ? "x" : "o";
+          
           return;
         }
       })
 
-      currentPlayerSymbol = store.currentPlayerSymbol === "o" ? "x" : "o";
+      
+      store.evtPlayed.post(params);
+      
     }
 
 

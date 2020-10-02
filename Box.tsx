@@ -32,7 +32,7 @@ export const Box: React.FunctionComponent<{
       play({"coordinates": box.coordinates, "mark": currentPlayerSymbol}),
        [box])} 
        className="box">
-       {box}
+       {box.mark}
     </div>
     
   )
