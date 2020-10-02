@@ -21,6 +21,7 @@ export const Box: React.FunctionComponent<{
   const onBoxClick = (Params: Parameters<Store["play"]>)=>{
     setIsBoxLoading(true);
     
+    
   }
 
   return(
