@@ -1,65 +1,136 @@
 import { Evt, NonPostableEvt, ToPostableEvt } from "evt";
 
+type Mark = "x" | "o";
+
+type Coordinate = 1 | 2 | 3;
+
+type Coordinates = {
+  x: Coordinate;
+  y: Coordinate;
+}
+
+type Box = {
+  mark: Mark | undefined;
+  coordinates: Coordinates;
+}
+
 
 
 export type Store = Readonly<{
-  boxes: Array<"o" | "x" | "">;
-  currentPlayerSymbol: "o" | "x";
-  play: (index: number)=> void;
+
+  boxes: [Box, Box, Box,
+          Box, Box, Box,
+          Box, Box, Box];
+
+  getMarkAtCoordinates: (coordinates: Coordinates) => Mark | undefined;
+  currentPlayerSymbol: Mark;
+  play: (params: {coordinates: Coordinates; mark: Mark})=> void;
   isGameWon: boolean;
 
-  evtPlayed: NonPostableEvt<Readonly<Store["boxes"][number]>>;
+  evtPlayed: NonPostableEvt<Parameters<Store["play"]>>;
+
+
+
+  
 
 }>
 
+
+
 export function getStore(){
   
-  const boxes: Store["boxes"] = [];
-  for(let i = 0; i < 9; i++){
-    boxes.push("");
-  }
+  let boxes: Store["boxes"] = [
+    {
+      "coordinates": {"x": 1, "y": 1},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 2, "y": 1},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 3, "y": 1},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 1, "y": 2},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 2, "y": 2},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 3, "y": 2},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 1, "y": 3},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 2, "y": 3},
+      "mark": undefined,
+    },
+    {
+      "coordinates": {"x": 3, "y": 3},
+      "mark": undefined,
+    },
 
-  const getHorisontalStreek = (boxes: Store["boxes"], index: 0 | 1 | 2 | 3 | 6)=>{
-    let streek: Store["boxes"] = [];
+  ];
 
-    for(let i = index; i < index + 3; i++){
-      streek.push(boxes[i]);
+
+
+ 
+
+  
+
+  let currentPlayerSymbol: Mark = "o";
+
+  let isGameWon: false;
+
+
+  const store: ToPostableEvt<Store> = {
+    boxes,
+    "getMarkAtCoordinates": coordinates =>{
+      let mark: Mark;
+      boxes.forEach(box =>{
+        if(box.coordinates === coordinates){
+          mark = box.mark;
+          return;
+        }
+      });
+
+      return mark;
+      
+    },
+
+    currentPlayerSymbol,
+
+    isGameWon,
+    "evtPlayed": new Evt(),
+    "play": params =>{
+      
+      boxes.forEach((box, index)=>{
+        if(box.coordinates === params.coordinates && box.mark !== undefined){
+          boxes[index].mark = currentPlayerSymbol;
+          return;
+        }
+      })
+
+      currentPlayerSymbol = store.currentPlayerSymbol === "o" ? "x" : "o";
     }
 
-    return streek;
-    
-  }
 
-  const determineIfGameWon = (boxes: Store["boxes"])=>{
 
-    
-    
-
-  }
-
-  let currentPlayerSymbol: Store["currentPlayerSymbol"] = "o";
-  let isGameWon = false;
-
-  const store: ToPostableEvt<Store>= {
-    boxes,
-    currentPlayerSymbol,
-    "play": index =>{
-      if(boxes[index] !== "" || isGameWon){
-        return;
-      }
-
-      boxes[index] = currentPlayerSymbol === "o" ? "o" : "x";
-      currentPlayerSymbol = currentPlayerSymbol === "o" ? "x" : "o";
-      
-
-      store.evtPlayed.post(boxes[index]);
-    },
-    
-    isGameWon,
-
-    "evtPlayed": new Evt()
   }
 
   return store;
 
+
+
+  
+
 }
+
+

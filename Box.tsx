@@ -9,13 +9,13 @@ import {useEvt} from "evt/hooks";
 
 export const Box: React.FunctionComponent<{
   box: Store["boxes"][number];
-  boxIndex: number;
   play: Store["play"];
+  currentPlayerSymbol: Store["currentPlayerSymbol"];
   
   
 }> = (props)=>{
 
-  const {box, boxIndex, play} = props;
+  const {box, play, currentPlayerSymbol} = props;
   
 
 
@@ -28,7 +28,12 @@ export const Box: React.FunctionComponent<{
 
   return(
 
-    <div onClick={useCallback(()=> play(boxIndex), [box])} className="box">{box}</div>
+    <div onClick={useCallback(()=> 
+      play({"coordinates": box.coordinates, "mark": currentPlayerSymbol}),
+       [box])} 
+       className="box">
+       {box}
+    </div>
     
   )
 
