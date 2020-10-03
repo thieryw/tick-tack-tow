@@ -7,7 +7,26 @@ import {App} from "./App";
 
 import {useEvt} from "evt/hooks";
 
-const store = getStore();
+const storePr = getStore();
 
+const Switcher: React.FunctionComponent = ()=>{
+  const [store, setStore] = useState(undefined);
 
-render(<App store={store} />, document.getElementById('root'));
+  useEffect(()=>{
+    storePr.then(storeValue =>{
+      setStore(storeValue);
+    })
+  },[store]);
+
+  
+  return(
+    <div>
+    {
+      store === undefined ? <h1>Loading...</h1> : <App store={store} />
+    }
+
+    </div>
+  )
+}
+
+render(<Switcher />, document.getElementById('root'));

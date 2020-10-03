@@ -13,29 +13,44 @@ export const App: React.FunctionComponent<{
   
   const {store} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
+  const [gameStatus, setGameStatus] = useState(store.gameStatus);
   
   useEvt(ctx =>{
-    store.evtPlayed.attach(ctx, () => forceUpdate());
+    store.evtPlayed.attach(ctx, () => {
+      forceUpdate();
+   
+    });
   },[store]);
+
+
+  useEvt(ctx =>{
+    store.evtGameWon.attach(ctx, status =>{
+      setGameStatus(status);
+    })
+  },[store])
 
 
   
   
   return(
-    <div className="boxContainer">
-      {
-        store.boxes.map((box, index) => <Box 
-          key={index}
-          box={box} 
-          currentPlayerSymbol={store.currentPlayerMark} 
-          play={store.play}
-          />
-        )
-        
-        
-        
-      }
-    
+    <div>
+      <h1>{!gameStatus.isGameWon ? "" : `Won By ${gameStatus.winnerMark}`}</h1>
+
+      <div className="boxContainer">
+        {
+          store.boxes.map((box, index) => <Box 
+            key={index}
+            box={box} 
+            currentPlayerSymbol={store.currentPlayerMark} 
+            play={store.play}
+            />
+          )
+          
+          
+          
+        }
+      
+      </div>
     </div>
 
   )

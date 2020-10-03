@@ -30,6 +30,8 @@ export type Store = Readonly<{
     winnerMark: Mark | undefined;
   };
 
+  evtGameWon: NonPostableEvt<Store["gameStatus"]>
+
   evtPlayed: NonPostableEvt<Parameters<Store["play"]>[0]>;
 
 
@@ -40,7 +42,7 @@ export type Store = Readonly<{
 
 
 
-export function getStore(){
+export async function getStore(): Promise<Store>{
   
   let boxes: Store["boxes"] = [
     {
@@ -101,6 +103,90 @@ export function getStore(){
 
   const getGameStatus = (boxes: Store["boxes"]): Store["gameStatus"] => {
     
+    const listOfOBoxes: Box[] = [];
+    const listOfXBoxes: Box[] = [];
+    
+    boxes.forEach(box=>{
+      switch(box.mark){
+        case "o" as Mark : listOfOBoxes.push(box); return;
+        case "x" as Mark : listOfXBoxes.push(box); return;
+        case undefined : return; 
+      }
+    })
+
+   
+
+    for(const list of [listOfOBoxes, listOfXBoxes]){
+      if(list.length >= 3){
+        let numberOfboxesWithSameXCoord = 0;
+        let numberOfboxesWithSameYCoord = 0;
+        let diagonalBoxes = 0;
+        let numberOfboxesWithSameXandY = 0;
+        
+        for(let i = 0; i < list.length - 1; i++){
+          for(let j = i+1; j < list.length; j++){
+            
+            if(list[i].coordinates.x === list[j].coordinates.x){
+              numberOfboxesWithSameXCoord++;
+              
+            }
+
+            if(list[i].coordinates.y === list[j].coordinates.y){
+              numberOfboxesWithSameYCoord++;
+              
+            }
+
+            
+
+            if(numberOfboxesWithSameYCoord === 3 || numberOfboxesWithSameXCoord === 3){
+              return {
+                "isGameWon": true,
+                "winnerMark": list[j].mark,
+              }
+            }
+
+
+          }
+        }
+
+        for(const box of list){
+          if(box.coordinates.x === box.coordinates.y){
+            numberOfboxesWithSameXandY++;
+          }
+
+          if(box.coordinates.x === 1 && box.coordinates.y === 3){
+            diagonalBoxes++;
+          }
+
+          if(box.coordinates.x === 2 && box.coordinates.y === 2){
+            diagonalBoxes++;
+          }
+
+          if(box.coordinates.x === 3 && box.coordinates.y === 1){
+            diagonalBoxes++;
+          }
+      
+
+          if(diagonalBoxes === 3 || numberOfboxesWithSameXandY === 3){
+            
+            return{
+              "isGameWon": true,
+              "winnerMark": box.mark,
+            }
+          }
+        }
+
+      }
+    }
+
+  
+ 
+    
+
+    return {
+      "isGameWon": false,
+      "winnerMark": undefined,
+    }
     
   }
 
@@ -125,14 +211,17 @@ export function getStore(){
     gameStatus,
 
     "evtPlayed": new Evt(),
+    "evtGameWon": new Evt(),
     
     "play": async params =>{
       
-      await simulateNetworkDelay(300);
+      
       
       if(gameStatus.isGameWon){
         return;
       }
+
+      await simulateNetworkDelay(300);
 
       boxes.forEach((box, index)=>{
         if(box.coordinates === params.coordinates && box.mark === undefined){
@@ -144,9 +233,11 @@ export function getStore(){
       });
 
     
+      gameStatus = getGameStatus(boxes);
 
-
-
+      if(gameStatus.isGameWon){
+        store.evtGameWon.post(gameStatus);
+      }
       
       store.evtPlayed.post(params);
       
@@ -157,6 +248,8 @@ export function getStore(){
 
 
   }
+
+  await simulateNetworkDelay(2000);
 
   return store;
 
