@@ -19,3 +19,7 @@ h1, p {
   background-color: white;
   font-size: 3em;
 }
+
+.winner{
+  color: blue;
+}

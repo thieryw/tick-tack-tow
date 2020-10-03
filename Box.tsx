@@ -11,11 +11,11 @@ export const Box: React.FunctionComponent<{
   box: Store["boxes"][number];
   play: Store["play"];
   currentPlayerSymbol: Store["currentPlayerMark"];
-  
+  gameStatus: Store["gameStatus"];
   
 }> = (props)=>{
 
-  const {box, play, currentPlayerSymbol} = props;
+  const {box, play, currentPlayerSymbol, gameStatus} = props;
   const [isBoxLoading, setIsBoxLoading] = useState(false);
 
   const onBoxClick = useCallback(()=>{
@@ -32,7 +32,7 @@ export const Box: React.FunctionComponent<{
   return(
 
     <div onClick={onBoxClick} 
-       className="box">
+       className={!gameStatus.isGameWon ? "box" : gameStatus.winnerMark === box.mark ? "box winner" : "box"}>
        {
          isBoxLoading ? "..." : box.mark
        }

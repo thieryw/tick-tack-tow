@@ -43,6 +43,7 @@ export const App: React.FunctionComponent<{
             box={box} 
             currentPlayerSymbol={store.currentPlayerMark} 
             play={store.play}
+            gameStatus={gameStatus}
             />
           )
           
