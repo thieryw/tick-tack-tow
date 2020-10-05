@@ -17,12 +17,7 @@ export const App: React.FunctionComponent<{
   const [gameStatus, setGameStatus] = useState(store.gameStatus);
   const [isGameLoading, setIsGameLoading] = useState(false);
   
-
-  useEvt(ctx =>{
-
-    Evt.merge(ctx, [store.evtPlayed, store.evtGameRestarted]).attach(()=> forceUpdate());
-
-  },[store])
+  
 
 
   useEvt(ctx =>{
@@ -48,6 +43,7 @@ export const App: React.FunctionComponent<{
       <h1 className="game-name">Tick Tack Toe</h1>
       <h3>{!gameStatus.isGameWon ? "" : `Won By "${gameStatus.winnerMark}"`}</h3>
       <h4>{isGameLoading ? "Loading..." : ""}</h4>
+      <p>{}</p>
 
       <div className="boxContainer">
         {
