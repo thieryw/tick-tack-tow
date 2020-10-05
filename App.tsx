@@ -5,6 +5,7 @@ import { getStore, Store } from './logic';
 import './style.css';
 import {useEvt} from "evt/hooks";
 import { Box } from "./Box";
+import { Evt } from "evt";
 
 
 export const App: React.FunctionComponent<{
@@ -14,13 +15,14 @@ export const App: React.FunctionComponent<{
   const {store} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
   const [gameStatus, setGameStatus] = useState(store.gameStatus);
+  const [isGameLoading, setIsGameLoading] = useState(false);
   
+
   useEvt(ctx =>{
-    store.evtPlayed.attach(ctx, () => {
-      forceUpdate();
-   
-    });
-  },[store]);
+
+    Evt.merge(ctx, [store.evtPlayed, store.evtGameRestarted]).attach(()=> forceUpdate());
+
+  },[store])
 
 
   useEvt(ctx =>{
@@ -29,12 +31,23 @@ export const App: React.FunctionComponent<{
     })
   },[store])
 
+  const newGame = useCallback(()=>{
+    setIsGameLoading(true);
+
+    store.newGame().then(()=>{
+      setIsGameLoading(false);
+      setGameStatus(store.gameStatus);
+    });
+
+  },[store])
 
   
   
   return(
     <div>
-      <h1>{!gameStatus.isGameWon ? "" : `Won By ${gameStatus.winnerMark}`}</h1>
+      <h1 className="game-name">Tick Tack Toe</h1>
+      <h3>{!gameStatus.isGameWon ? "" : `Won By "${gameStatus.winnerMark}"`}</h3>
+      <h4>{isGameLoading ? "Loading..." : ""}</h4>
 
       <div className="boxContainer">
         {
@@ -52,6 +65,12 @@ export const App: React.FunctionComponent<{
         }
       
       </div>
+
+      <input onClick={newGame} 
+        className="new-game-btn" 
+        type="button" 
+        value="New Game"
+      />
     </div>
 
   )

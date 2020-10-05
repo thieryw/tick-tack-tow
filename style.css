@@ -23,3 +23,15 @@ h1, p {
 .winner{
   color: blue;
 }
+
+h3{
+  color: blue;
+}
+
+body{
+  text-align: center;
+}
+
+.new-game-btn{
+  margin-top: 50px;
+}
