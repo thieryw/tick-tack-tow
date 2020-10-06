@@ -14,16 +14,11 @@ export const App: React.FunctionComponent<{
   
   const {store} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
-  const [gameStatus, setGameStatus] = useState(store.gameStatus);
   const [isGameLoading, setIsGameLoading] = useState(false);
-  
-  
 
 
   useEvt(ctx =>{
-    store.evtGameWon.attach(ctx, status =>{
-      setGameStatus(status);
-    })
+    Evt.merge(ctx, [store.evtPlayed, store.evtGameWon]).attach(()=> forceUpdate());
   },[store])
 
   const newGame = useCallback(()=>{
@@ -31,7 +26,6 @@ export const App: React.FunctionComponent<{
 
     store.newGame().then(()=>{
       setIsGameLoading(false);
-      setGameStatus(store.gameStatus);
     });
 
   },[store])
@@ -41,9 +35,9 @@ export const App: React.FunctionComponent<{
   return(
     <div>
       <h1 className="game-name">Tick Tack Toe</h1>
-      <h3>{!gameStatus.isGameWon ? "" : `Won By "${gameStatus.winnerMark}"`}</h3>
+      <h3>{!store.gameStatus.isGameWon ? "" : `Won By "${store.gameStatus.winnerMark}"`}</h3>
       <h4>{isGameLoading ? "Loading..." : ""}</h4>
-      <p>{}</p>
+      <p className="player-playing">{store.currentPlayerMark}</p>
 
       <div className="boxContainer">
         {
@@ -52,7 +46,7 @@ export const App: React.FunctionComponent<{
             box={box} 
             currentPlayerSymbol={store.currentPlayerMark} 
             play={store.play}
-            gameStatus={gameStatus}
+            gameStatus={store.gameStatus}
             />
           )
           

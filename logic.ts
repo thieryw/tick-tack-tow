@@ -96,14 +96,7 @@ export async function getStore(): Promise<Store>{
 
   
 
-  let currentPlayerMark: Mark = "o";
-
-  let gameStatus: Store["gameStatus"] = {
-    "isGameWon": false,
-    "hasGameStarted": false,
-    "winnerMark": undefined
-  }
-
+  
   
 
   const getGameStatus = (boxes: Store["boxes"]): Store["gameStatus"] => {
@@ -178,10 +171,6 @@ export async function getStore(): Promise<Store>{
       }
     }
 
-  
- 
-    
-
     return {
       "isGameWon": false,
       "hasGameStarted": true,
@@ -206,9 +195,13 @@ export async function getStore(): Promise<Store>{
       
     },
 
-    currentPlayerMark,
+    "currentPlayerMark": "o",
 
-    gameStatus,
+    "gameStatus": {
+      "hasGameStarted": false,
+      "isGameWon": false,
+      "winnerMark": undefined,
+    },
 
     "evtPlayed": new Evt(),
     "evtGameWon": new Evt(),
@@ -217,7 +210,7 @@ export async function getStore(): Promise<Store>{
       
       
       
-      if(gameStatus.isGameWon){
+      if(store.gameStatus.isGameWon){       
         return;
       }
 
@@ -225,18 +218,19 @@ export async function getStore(): Promise<Store>{
 
       boxes.forEach((box, index)=>{
         if(box.coordinates === params.coordinates && box.mark === undefined){
-          boxes[index].mark = currentPlayerMark;
-          currentPlayerMark = currentPlayerMark === "o" ? "x" : "o";
+          boxes[index].mark = store.currentPlayerMark;
+          (store.currentPlayerMark as Store["currentPlayerMark"]) = store.currentPlayerMark === "o" 
+          ? "x" : "o";
           
           return;
         }
       });
 
     
-      gameStatus = getGameStatus(boxes);
+      (store.gameStatus as Store["gameStatus"]) = getGameStatus(boxes);
 
-      if(gameStatus.isGameWon){
-        store.evtGameWon.post(gameStatus);
+      if(store.gameStatus.isGameWon){
+        store.evtGameWon.post(store.gameStatus);
       }
       
       store.evtPlayed.post(params);
@@ -244,7 +238,7 @@ export async function getStore(): Promise<Store>{
     },
 
     "newGame": async ()=>{
-      if(!gameStatus.hasGameStarted){
+      if(!store.gameStatus.hasGameStarted){
         return;
       }
       await simulateNetworkDelay(500);
@@ -253,8 +247,8 @@ export async function getStore(): Promise<Store>{
         box.mark = undefined;
       });
 
-      currentPlayerMark = "o";
-      gameStatus = {
+      (store.currentPlayerMark as Store["currentPlayerMark"]) = "o";
+      (store.gameStatus as Store["gameStatus"]) = {
         "isGameWon": false,
         "hasGameStarted": false,
         "winnerMark": undefined,
