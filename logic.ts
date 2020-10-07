@@ -95,6 +95,7 @@ export async function getStore(): Promise<Store>{
 
     "currentPlayerMark": "o",
     "getMarkAtCoordinates": coordinates =>{
+      console.log(store.boxes[coordinates.x - 1][coordinates.y - 1]);
       return store.boxes[coordinates.x - 1][coordinates.y - 1];
     },
 

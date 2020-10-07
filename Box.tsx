@@ -1,43 +1,35 @@
 import React, { Component, useCallback, useContext, useState, useEffect, useReducer } from 'react';
 import { render } from 'react-dom';
 
-import { getStore, Store } from './logic';
+import { getStore, Store, Coordinates } from './logic';
 import './style.css';
 import {useEvt} from "evt/hooks";
 
 
 
 export const Box: React.FunctionComponent<{
-  box: Store["boxes"][number];
-  play: Store["play"];
-  currentPlayerSymbol: Store["currentPlayerMark"];
-  gameStatus: Store["gameStatus"];
-  
-}> = (props)=>{
-
-  const {box, play, currentPlayerSymbol, gameStatus} = props;
-  const [isBoxLoading, setIsBoxLoading] = useState(false);
-
-  const onBoxClick = useCallback(()=>{
-    if(box.mark !== undefined){
-      return;
-    }
-    setIsBoxLoading(true);
-    play({"coordinates": box.coordinates, "mark": currentPlayerSymbol}).then(()=>{
-      setIsBoxLoading(false);
+  mark: Store["boxes"][number][number];
+  coordinates: Coordinates;
+  store: Pick<Store,
+    "getMarkAtCoordinates" |
+    "currentPlayerMark" |
+    "play" |
+    "evtPlayed" |
+    "evtGameRestarted"
+    
+  >;
+}> = props =>{
+  const {store, mark, coordinates} = props;
+  const [, forceUpdate] = useReducer(x=>x+1, 0);
+  useEvt(ctx =>{
+    store.evtPlayed.attach(ctx, ()=>{
+      forceUpdate();
     });
-    
-  },[isBoxLoading]);
-
+  },[store])
+  
   return(
-
-    <div onClick={onBoxClick} 
-       className={!gameStatus.isGameWon ? "box" : gameStatus.winnerMark === box.mark ? "box winner" : "box"}>
-       {
-         isBoxLoading ? "..." : box.mark
-       }
+    <div className="box">
+      plkj
     </div>
-    
   )
-
 }
