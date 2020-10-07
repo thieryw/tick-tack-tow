@@ -16,7 +16,12 @@ export const App: React.FunctionComponent<{
   const [, forceUpdate] = useReducer(x=>x+1, 0);
   const [isGameLoading, setIsGameLoading] = useState(false);
 
-
+  useEvt(ctx=>{
+    store.evtPlayed.attach(ctx, ()=>{
+      
+      forceUpdate();
+    });
+  },[store])
 
   const newGame = useCallback(()=>{
     setIsGameLoading(true);
@@ -38,12 +43,15 @@ export const App: React.FunctionComponent<{
 
       <div className="boxContainer">
         {
-          store.boxes.map((box, coordy) =>{
-            box.map((mark, coordx)=>{
+          store.boxes.map((box, coordx) =>{
+            return box.map((mark, coordy)=>{
             
-              <Box coordinates={{"x": (coordx + 1) as Coordinate, "y" : (coordy + 1) as Coordinate}}
+              return <Box coordinates={{"x": (coordx + 1) as Coordinate, "y" : (coordy + 1) as Coordinate}}
                 store={store}
                 mark={mark}
+                
+              
+                
               />
             
             })

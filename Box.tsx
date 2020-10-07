@@ -19,17 +19,22 @@ export const Box: React.FunctionComponent<{
     
   >;
 }> = props =>{
-  const {store, mark, coordinates} = props;
+  const {store, coordinates, mark} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
-  useEvt(ctx =>{
+  /*useEvt(ctx =>{
     store.evtPlayed.attach(ctx, ()=>{
       forceUpdate();
+      console.log("ok");
     });
-  },[store])
+  },[store])*/
   
   return(
-    <div className="box">
-      plkj
+    <div onClick={useCallback(
+     ()=> store.play({coordinates,"mark": store.currentPlayerMark}), [store]
+    )} className="box">
+      {
+        mark
+      }
     </div>
   )
 }

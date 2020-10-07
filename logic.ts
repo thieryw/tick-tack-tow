@@ -31,7 +31,13 @@ type StoreLike = Pick<Store, "getMarkAtCoordinates">;
 
 export function isGameWon(store: StoreLike): boolean{
 
-  const getMarkCoef = (mark: Mark)=> mark === "o" ? -1 : 1;
+  const getMarkCoef = (mark: Mark)=> {
+    if(mark === undefined){
+      return 0;
+    }
+
+    return mark === "o" ? 1 : -1;
+  };
 
   const isWining = (m1: Mark, m2: Mark, m3: Mark)=>
     Math.abs(getMarkCoef(m1) + getMarkCoef(m2) + getMarkCoef(m3)) === 3;
@@ -43,6 +49,7 @@ export function isGameWon(store: StoreLike): boolean{
       store.getMarkAtCoordinates({x, "y": 2}),
       store.getMarkAtCoordinates({x, "y": 3})
     )){
+   
       return true;
     }
   }
@@ -95,13 +102,15 @@ export async function getStore(): Promise<Store>{
 
     "currentPlayerMark": "o",
     "getMarkAtCoordinates": coordinates =>{
-      console.log(store.boxes[coordinates.x - 1][coordinates.y - 1]);
+      
       return store.boxes[coordinates.x - 1][coordinates.y - 1];
     },
 
     "play": async params =>{
-
+      
+      
       if(isGameWon(store)){
+        
         throw Error("Error game finiched, can not play!");
       }
 
@@ -111,6 +120,8 @@ export async function getStore(): Promise<Store>{
       store.currentPlayerMark = store.currentPlayerMark === "o" ? "x" : "o";
 
       store.evtPlayed.post(params);
+
+
 
     },
 
