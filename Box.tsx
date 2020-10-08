@@ -21,6 +21,8 @@ export const Box: React.FunctionComponent<{
   const [isLoading, setIsLoading] = useState(false);
   
   const play = useCallback(async ()=>{
+   
+
     if(isGameWon(store) || store.getMarkAtCoordinates(coordinates) !== undefined){
      
       return;

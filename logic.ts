@@ -108,18 +108,8 @@ export async function getStore(): Promise<Store>{
 
     "play": async params =>{
       
-      try{
-        if(isGameWon(store) || store.getMarkAtCoordinates(params.coordinates) !== undefined){
-          throw new Error("game is won");
-        }
-      }
-      catch(err){
-        console.log(err);
-        return;
-      }
+ 
       
-     
-
       await simulateNetworkDelay(300);
 
       store.boxes[params.coordinates.x - 1][params.coordinates.y - 1] = params.mark;
@@ -132,8 +122,10 @@ export async function getStore(): Promise<Store>{
     },
 
     "newGame": async ()=>{
-      await simulateNetworkDelay(300);
+      
 
+
+      await simulateNetworkDelay(300);
 
       store.boxes = [
         [undefined, undefined, undefined],

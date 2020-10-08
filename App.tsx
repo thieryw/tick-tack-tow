@@ -25,6 +25,21 @@ export const App: React.FunctionComponent<{
 
  
   const newGame = useCallback(()=>{
+    let hasGameStarted = false;
+    block:{
+      for(const box of store.boxes){
+        for(const mark of box){
+          if(mark !== undefined){
+            hasGameStarted = true;
+            break block;
+          }
+        }
+      }
+    }
+
+    if(!hasGameStarted){
+      return;
+    }
     setIsGameLoading(true);
 
     store.newGame().then(()=>{
