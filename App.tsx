@@ -43,19 +43,13 @@ export const App: React.FunctionComponent<{
 
       <div className="boxContainer">
         {
-          store.boxes.map((box, coordx) =>{
-            return box.map((mark, coordy)=>{
-            
-              return <Box coordinates={{"x": (coordx + 1) as Coordinate, "y" : (coordy + 1) as Coordinate}}
+          [1, 2, 3].map(x => 
+            [1, 2, 3].map(y=> 
+              <Box coordinates={{"x": x as Coordinate, "y": y as Coordinate}}
                 store={store}
-                mark={mark}
-                
-              
-                
               />
-            
-            })
-          })
+            )
+          )
         }
       
       </div>
