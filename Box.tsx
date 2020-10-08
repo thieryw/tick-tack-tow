@@ -1,7 +1,7 @@
 import React, { Component, useCallback, useContext, useState, useEffect, useReducer } from 'react';
 import { render } from 'react-dom';
 
-import { getStore, Store, Coordinates } from './logic';
+import { getStore, Store, Coordinates, isGameWon } from './logic';
 import './style.css';
 import {useEvt} from "evt/hooks";
 
@@ -12,22 +12,30 @@ export const Box: React.FunctionComponent<{
   store: Pick<Store,
     "getMarkAtCoordinates" |
     "currentPlayerMark" |
-    "play" |
-    "evtPlayed" |
-    "evtGameRestarted"
+    "play"
+
     
   >;
 }> = props =>{
   const {store, coordinates} = props;
-  const [, forceUpdate] = useReducer(x=>x+1, 0);
-
+  const [isLoading, setIsLoading] = useState(false);
   
+  const play = useCallback(async ()=>{
+    if(isGameWon(store) || store.getMarkAtCoordinates(coordinates) !== undefined){
+     
+      return;
+    }
+    setIsLoading(true);
+
+    await store.play({coordinates, "mark": store.currentPlayerMark});
+
+    setIsLoading(false);
+  },[store, isLoading]);
+
   return(
-    <div onClick={useCallback(
-     ()=> store.play({coordinates,"mark": store.currentPlayerMark}), [store]
-    )} className="box">
+    <div onClick={play} className="box">
       {
-        store.getMarkAtCoordinates(coordinates)
+        isLoading ? "..." : store.getMarkAtCoordinates(coordinates)
       }
     </div>
   )

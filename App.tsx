@@ -1,7 +1,7 @@
 import React, { Component, useCallback, useContext, useState, useEffect, useReducer } from 'react';
 import { render } from 'react-dom';
 
-import { Coordinates, getStore, Store , Coordinate} from './logic';
+import { Coordinates, getStore, Store , Coordinate, isGameWon} from './logic';
 import './style.css';
 import {useEvt} from "evt/hooks";
 import { Box } from "./Box";
@@ -15,14 +15,15 @@ export const App: React.FunctionComponent<{
   const {store} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
   const [isGameLoading, setIsGameLoading] = useState(false);
+  const coordinates: Coordinate[] = [1,2,3];
+  
 
-  useEvt(ctx=>{
-    store.evtPlayed.attach(ctx, ()=>{
-      
-      forceUpdate();
-    });
+  useEvt(ctx =>{
+    Evt.merge(ctx, [store.evtGameRestarted, store.evtPlayed]).attach(()=> forceUpdate());
+
   },[store])
 
+ 
   const newGame = useCallback(()=>{
     setIsGameLoading(true);
 
@@ -37,15 +38,15 @@ export const App: React.FunctionComponent<{
   return(
     <div>
       <h1 className="game-name">Tick Tack Toe</h1>
-      
+      <h2>{isGameWon(store) ? `Game won by "${store.currentPlayerMark === "o" ? "x" : "o"}"` : ""} </h2>
       <h4>{isGameLoading ? "Loading..." : ""}</h4>
       <p className="player-playing">{store.currentPlayerMark}</p>
 
       <div className="boxContainer">
         {
-          [1, 2, 3].map(x => 
-            [1, 2, 3].map(y=> 
-              <Box coordinates={{"x": x as Coordinate, "y": y as Coordinate}}
+          coordinates.map(x => 
+            coordinates.map(y=> 
+              <Box coordinates={{x, y}}
                 store={store}
               />
             )

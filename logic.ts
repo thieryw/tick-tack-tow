@@ -108,11 +108,17 @@ export async function getStore(): Promise<Store>{
 
     "play": async params =>{
       
-      
-      if(isGameWon(store)){
-        
-        throw Error("Error game finiched, can not play!");
+      try{
+        if(isGameWon(store) || store.getMarkAtCoordinates(params.coordinates) !== undefined){
+          throw new Error("game is won");
+        }
       }
+      catch(err){
+        console.log(err);
+        return;
+      }
+      
+     
 
       await simulateNetworkDelay(300);
 
@@ -129,15 +135,12 @@ export async function getStore(): Promise<Store>{
       await simulateNetworkDelay(300);
 
 
-      store.boxes.forEach(box =>{
-        box.forEach(mark =>{
-          if(mark === undefined){
-            return;
-          }
+      store.boxes = [
+        [undefined, undefined, undefined],
+        [undefined, undefined, undefined],
+        [undefined, undefined, undefined]
 
-          mark = undefined;
-        });
-      });
+      ]
 
 
       store.currentPlayerMark = "o";
