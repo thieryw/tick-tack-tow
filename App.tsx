@@ -24,7 +24,7 @@ export const App: React.FunctionComponent<{
   },[store])
 
  
-  const newGame = useCallback(()=>{
+  const newGame = useCallback(async ()=>{
     let hasGameStarted = false;
     block:{
       for(const box of store.boxes){
@@ -42,9 +42,9 @@ export const App: React.FunctionComponent<{
     }
     setIsGameLoading(true);
 
-    store.newGame().then(()=>{
-      setIsGameLoading(false);
-    });
+    await store.newGame();
+    
+    setIsGameLoading(false);
 
   },[store])
 
