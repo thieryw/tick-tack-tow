@@ -20,12 +20,7 @@ export const Box: React.FunctionComponent<{
 }> = props =>{
   const {store, coordinates} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
-  /*useEvt(ctx =>{
-    store.evtPlayed.attach(ctx, ()=>{
-      forceUpdate();
-      console.log("ok");
-    });
-  },[store])*/
+
   
   return(
     <div onClick={useCallback(
