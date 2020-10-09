@@ -31,7 +31,7 @@ export type Store = {
   newGame: ()=> Promise<void>;
 
   evtPlayed: NonPostableEvt<Parameters<Store["play"]>[0]>;
-  evtGameRestarted: NonPostableEvt<Store["getMarkAtCoordinates"]>;
+  evtGameRestarted: NonPostableEvt<Store["currentPlayerMark"]>;
 }
 
 type StoreLike = Pick<Store, "getMarkAtCoordinates">;
@@ -141,7 +141,7 @@ export async function getStore(): Promise<Store>{
 
         store.currentPlayerMark = "o";
 
-        store.evtGameRestarted.post(store.getMarkAtCoordinates);
+        store.evtGameRestarted.post(store.currentPlayerMark);
         
       },3)
 

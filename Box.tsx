@@ -27,11 +27,11 @@ export const Box: React.FunctionComponent<{
     store.evtPlayed.attach(
       params=> params.coordinates === coordinates, 
       ctx,
-      ()=> {forceUpdate(); console.log("ok")}
+      ()=> forceUpdate()
     );
 
     store.evtGameRestarted.attach(
-      params => params. ,
+      ()=> store.getMarkAtCoordinates(coordinates) !== undefined ,
       ctx,
       () => forceUpdate()
     );
