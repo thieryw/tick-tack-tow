@@ -8,6 +8,15 @@ import { Box } from "./Box";
 import { Evt } from "evt";
 
 
+const allCoordinates: Coordinates[] = [];
+
+
+([1,2,3] as const).forEach(x =>{
+  ([1,2,3] as const).forEach(y =>{
+    allCoordinates.push({x,y});
+  })
+})
+
 export const App: React.FunctionComponent<{
   store: Store;
 }> = (props)=>{
@@ -15,31 +24,23 @@ export const App: React.FunctionComponent<{
   const {store} = props;
   const [, forceUpdate] = useReducer(x=>x+1, 0);
   const [isGameLoading, setIsGameLoading] = useState(false);
-  const coordinates: Coordinate[] = [1,2,3];
+  const [currentPlayerMark, setCurrentPlayerMark] = useState(store.currentPlayerMark);
   
 
-  useEvt(ctx =>{
-    Evt.merge(ctx, [store.evtGameRestarted, store.evtPlayed]).attach(()=> forceUpdate());
 
-  },[store])
+
+  useEvt(ctx =>{
+    store.evtPlayed.attach(params=> setCurrentPlayerMark(params.mark === "o" ? "x" : "o"));
+    store.evtGameRestarted.attach(ctx, ()=> setCurrentPlayerMark("o"));
+
+ 
+  },[store]);
 
  
   const newGame = useCallback(async ()=>{
-    let hasGameStarted = false;
-    block:{
-      for(const box of store.boxes){
-        for(const mark of box){
-          if(mark !== undefined){
-            hasGameStarted = true;
-            break block;
-          }
-        }
-      }
-    }
+    
 
-    if(!hasGameStarted){
-      return;
-    }
+
     setIsGameLoading(true);
 
     await store.newGame();
@@ -53,19 +54,19 @@ export const App: React.FunctionComponent<{
   return(
     <div>
       <h1 className="game-name">Tick Tack Toe</h1>
-      <h2>{isGameWon(store) ? `Game won by "${store.currentPlayerMark === "o" ? "x" : "o"}"` : ""} </h2>
+      <h2>{isGameWon(store) ? `Game won by "${currentPlayerMark}"` : ""}</h2>
       <h4>{isGameLoading ? "Loading..." : ""}</h4>
-      <p className="player-playing">{store.currentPlayerMark}</p>
+      <p className="player-playing">{currentPlayerMark}</p>
 
       <div className="boxContainer">
         {
-          coordinates.map(x => 
-            coordinates.map(y=> 
-              <Box coordinates={{x, y}}
-                store={store}
-              />
-            )
-          )
+          allCoordinates.map(coordinates =>{
+            return <Box
+              coordinates={coordinates}
+              store={store}
+              key={JSON.stringify(coordinates)} 
+            />
+          })
         }
       
       </div>

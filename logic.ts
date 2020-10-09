@@ -10,13 +10,20 @@ export type Coordinates = {
 
 type Mark = "x" | "o";
 
-
-export type Store = {
-  boxes: [
+type Boxes = [
           [Mark | undefined, Mark | undefined, Mark | undefined],
           [Mark | undefined, Mark | undefined, Mark | undefined],
           [Mark | undefined, Mark | undefined, Mark | undefined]
          ];
+
+let boxes: Boxes = [
+  [undefined, undefined, undefined],
+  [undefined, undefined, undefined],
+  [undefined, undefined, undefined]
+]
+
+export type Store = {
+  
 
   getMarkAtCoordinates: (coordinates: Coordinates) => Mark | undefined;
   currentPlayerMark: Mark;
@@ -24,7 +31,7 @@ export type Store = {
   newGame: ()=> Promise<void>;
 
   evtPlayed: NonPostableEvt<Parameters<Store["play"]>[0]>;
-  evtGameRestarted: NonPostableEvt<{boxes: Store["boxes"]; currentPlayerMark: Store["currentPlayerMark"]}>;
+  evtGameRestarted: NonPostableEvt<Store["getMarkAtCoordinates"]>;
 }
 
 type StoreLike = Pick<Store, "getMarkAtCoordinates">;
@@ -94,16 +101,11 @@ export async function getStore(): Promise<Store>{
   }
 
   const store: ToPostableEvt<Store> = {
-    "boxes": [
-      [undefined, undefined, undefined],
-      [undefined, undefined, undefined],
-      [undefined, undefined, undefined]
-    ],
 
     "currentPlayerMark": "o",
     "getMarkAtCoordinates": coordinates =>{
       
-      return store.boxes[coordinates.x - 1][coordinates.y - 1];
+      return boxes[coordinates.x - 1][coordinates.y - 1];
     },
 
     "play": async params =>{
@@ -111,12 +113,14 @@ export async function getStore(): Promise<Store>{
  
       
       await simulateNetworkDelay(300);
+      setTimeout(()=>{
+        boxes[params.coordinates.x - 1][params.coordinates.y - 1] = params.mark;
+        store.currentPlayerMark = store.currentPlayerMark === "o" ? "x" : "o";
 
-      store.boxes[params.coordinates.x - 1][params.coordinates.y - 1] = params.mark;
-      store.currentPlayerMark = store.currentPlayerMark === "o" ? "x" : "o";
+        store.evtPlayed.post(params);
 
-      store.evtPlayed.post(params);
-
+      },3)
+  
 
 
     },
@@ -126,19 +130,21 @@ export async function getStore(): Promise<Store>{
 
 
       await simulateNetworkDelay(300);
+      setTimeout(()=>{
+        boxes = [
+          [undefined, undefined, undefined],
+          [undefined, undefined, undefined],
+          [undefined, undefined, undefined]
 
-      store.boxes = [
-        [undefined, undefined, undefined],
-        [undefined, undefined, undefined],
-        [undefined, undefined, undefined]
-
-      ]
+        ]
 
 
-      store.currentPlayerMark = "o";
+        store.currentPlayerMark = "o";
 
-      store.evtGameRestarted.post({"boxes": store.boxes, "currentPlayerMark": store.currentPlayerMark});
-      
+        store.evtGameRestarted.post(store.getMarkAtCoordinates);
+        
+      },3)
+
       
     },
 

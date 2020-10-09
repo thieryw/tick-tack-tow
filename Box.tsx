@@ -8,31 +8,54 @@ import {useEvt} from "evt/hooks";
 
 
 export const Box: React.FunctionComponent<{
-  coordinates: Coordinates;
+  coordinates: Coordinates; 
   store: Pick<Store,
     "getMarkAtCoordinates" |
     "currentPlayerMark" |
-    "play"
-
+    "play" |
+    "evtPlayed" |
+    "evtGameRestarted"
+    
     
   >;
 }> = props =>{
   const {store, coordinates} = props;
   const [isLoading, setIsLoading] = useState(false);
+  const [, forceUpdate] = useReducer(x=>x+1, 0);
+
+  useEvt(ctx =>{
+    store.evtPlayed.attach(
+      params=> params.coordinates === coordinates, 
+      ctx,
+      ()=> {forceUpdate(); console.log("ok")}
+    );
+
+    store.evtGameRestarted.attach(
+      params => params. ,
+      ctx,
+      () => forceUpdate()
+    );
+
+
+  },[store])
+  
   
   const play = useCallback(async ()=>{
    
 
-    if(isGameWon(store) || store.getMarkAtCoordinates(coordinates) !== undefined){
+    if(store.getMarkAtCoordinates(coordinates) !== undefined){
      
+      return;
+    }
+    if(isGameWon(store)){
       return;
     }
     setIsLoading(true);
 
     await store.play({coordinates, "mark": store.currentPlayerMark});
-
+    
     setIsLoading(false);
-  },[store, isLoading]);
+  },[store]);
 
   return(
     <div onClick={play} className="box">
