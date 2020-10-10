@@ -16,11 +16,7 @@ type Boxes = [
           [Mark | undefined, Mark | undefined, Mark | undefined]
          ];
 
-let boxes: Boxes = [
-  [undefined, undefined, undefined],
-  [undefined, undefined, undefined],
-  [undefined, undefined, undefined]
-]
+
 
 export type Store = {
   
@@ -100,6 +96,13 @@ export async function getStore(): Promise<Store>{
     return new Promise<void>(resolve => setTimeout(resolve, delay));
   }
 
+
+  const boxes: Boxes = [
+    [undefined, undefined, undefined],
+    [undefined, undefined, undefined],
+    [undefined, undefined, undefined]
+  ];
+
   const store: ToPostableEvt<Store> = {
 
     "currentPlayerMark": "o",
@@ -113,13 +116,13 @@ export async function getStore(): Promise<Store>{
  
       
       await simulateNetworkDelay(300);
-      setTimeout(()=>{
-        boxes[params.coordinates.x - 1][params.coordinates.y - 1] = params.mark;
-        store.currentPlayerMark = store.currentPlayerMark === "o" ? "x" : "o";
+  
+      boxes[params.coordinates.x - 1][params.coordinates.y - 1] = params.mark;
+      store.currentPlayerMark = store.currentPlayerMark === "o" ? "x" : "o";
 
-        store.evtPlayed.post(params);
+      store.evtPlayed.post(params);
 
-      },3)
+      
   
 
 
@@ -130,20 +133,15 @@ export async function getStore(): Promise<Store>{
 
 
       await simulateNetworkDelay(300);
-      setTimeout(()=>{
-        boxes = [
-          [undefined, undefined, undefined],
-          [undefined, undefined, undefined],
-          [undefined, undefined, undefined]
+      
+      boxes.forEach(box=>{
+        box.splice(0, 3, undefined);
+      });
 
-        ]
+      store.currentPlayerMark = "o";
 
-
-        store.currentPlayerMark = "o";
-
-        store.evtGameRestarted.post(store.currentPlayerMark);
+      store.evtGameRestarted.post(store.currentPlayerMark);
         
-      },3)
 
       
     },

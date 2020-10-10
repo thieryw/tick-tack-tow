@@ -1,11 +1,9 @@
-import React, { Component, useCallback, useContext, useState, useEffect, useReducer } from 'react';
-import { render } from 'react-dom';
-
-import { Coordinates, getStore, Store , Coordinate, isGameWon} from './logic';
+import React, {useCallback, useState, useReducer } from 'react';
+import { Coordinates, Store , isGameWon} from './logic';
 import './style.css';
 import {useEvt} from "evt/hooks";
 import { Box } from "./Box";
-import { Evt } from "evt";
+import { useAsyncCallback } from "react-async-hook";
 
 
 const allCoordinates: Coordinates[] = [];
@@ -17,46 +15,20 @@ const allCoordinates: Coordinates[] = [];
   })
 })
 
+
 export const App: React.FunctionComponent<{
   store: Store;
 }> = (props)=>{
   
-  const {store} = props;
-  const [, forceUpdate] = useReducer(x=>x+1, 0);
-  const [isGameLoading, setIsGameLoading] = useState(false);
-  const [currentPlayerMark, setCurrentPlayerMark] = useState(store.currentPlayerMark);
   
+  const {store} = props;  
+  const asyncNewGame = useAsyncCallback(store.newGame);
 
 
-
-  useEvt(ctx =>{
-    store.evtPlayed.attach(params=> setCurrentPlayerMark(params.mark === "o" ? "x" : "o"));
-    store.evtGameRestarted.attach(ctx, ()=> setCurrentPlayerMark("o"));
-
- 
-  },[store]);
-
- 
-  const newGame = useCallback(async ()=>{
-    
-
-
-    setIsGameLoading(true);
-
-    await store.newGame();
-    
-    setIsGameLoading(false);
-
-  },[store])
-
-  
-  
   return(
     <div>
-      <h1 className="game-name">Tick Tack Toe</h1>
-      <h2>{isGameWon(store) ? `Game won by "${currentPlayerMark}"` : ""}</h2>
-      <h4>{isGameLoading ? "Loading..." : ""}</h4>
-      <p className="player-playing">{currentPlayerMark}</p>
+
+      <GameInfo isGameLoading={asyncNewGame.loading} store={store} />
 
       <div className="boxContainer">
         {
@@ -71,12 +43,44 @@ export const App: React.FunctionComponent<{
       
       </div>
 
-      <input onClick={newGame} 
+      <input onClick={useCallback(()=> asyncNewGame.execute(), [store])} 
         className="new-game-btn" 
         type="button" 
         value="New Game"
+        disabled={asyncNewGame.loading}
       />
     </div>
 
+  )
+}
+
+
+
+
+const GameInfo: React.FunctionComponent<{
+  isGameLoading: boolean;
+  store: Pick<Store,
+    "currentPlayerMark" |
+    "getMarkAtCoordinates" |
+    "evtPlayed"
+  >
+}> = (props)=>{
+  const {store, isGameLoading} = props;
+  const [, forceUpdate] = useReducer(x=>x+1, 0);
+  
+  useEvt(ctx =>{
+    store.evtPlayed.attach(
+      ctx,
+      ()=> forceUpdate()
+    );
+  },[store])
+
+  return(
+    <div>
+      <h1 className="game-name">Tick tack toe</h1>
+      <h2>{isGameWon(store) ? `Game won by "${store.currentPlayerMark}"` : ""}</h2>
+      <h4>{isGameLoading ? "Loading..." : ""}</h4>
+      <p className="player-playing">{store.currentPlayerMark}</p>
+    </div>
   )
 }

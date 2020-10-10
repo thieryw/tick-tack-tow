@@ -1,10 +1,8 @@
-import React, { Component, useCallback, useContext, useState, useEffect, useReducer } from 'react';
-import { render } from 'react-dom';
-
-import { getStore, Store, Coordinates, isGameWon } from './logic';
+import React, { useCallback, useState, useReducer } from 'react';
+import { Store, Coordinates, isGameWon } from './logic';
 import './style.css';
 import {useEvt} from "evt/hooks";
-
+import { useAsyncCallback } from "react-async-hook";
 
 
 export const Box: React.FunctionComponent<{
@@ -20,18 +18,17 @@ export const Box: React.FunctionComponent<{
   >;
 }> = props =>{
   const {store, coordinates} = props;
-  const [isLoading, setIsLoading] = useState(false);
+  
   const [, forceUpdate] = useReducer(x=>x+1, 0);
 
   useEvt(ctx =>{
     store.evtPlayed.attach(
-      params=> params.coordinates === coordinates, 
+      data=> data.coordinates.x === coordinates.x && data.coordinates.y === coordinates.y, 
       ctx,
       ()=> forceUpdate()
     );
 
     store.evtGameRestarted.attach(
-      ()=> store.getMarkAtCoordinates(coordinates) !== undefined ,
       ctx,
       () => forceUpdate()
     );
@@ -39,28 +36,22 @@ export const Box: React.FunctionComponent<{
 
   },[store])
   
-  
-  const play = useCallback(async ()=>{
-   
+  const asyncPlay = useAsyncCallback(store.play);
 
-    if(store.getMarkAtCoordinates(coordinates) !== undefined){
-     
-      return;
-    }
-    if(isGameWon(store)){
-      return;
-    }
-    setIsLoading(true);
-
-    await store.play({coordinates, "mark": store.currentPlayerMark});
-    
-    setIsLoading(false);
-  },[store]);
 
   return(
-    <div onClick={play} className="box">
+    <div onClick={
+        useCallback(()=> {
+        if(store.getMarkAtCoordinates(coordinates) !== undefined || isGameWon(store)){
+          return;
+        }
+        asyncPlay.execute({coordinates, "mark": store.currentPlayerMark})
+        },[store])        
+      } 
+      className="box"
+    >
       {
-        isLoading ? "..." : store.getMarkAtCoordinates(coordinates)
+        asyncPlay.loading ? "..." : store.getMarkAtCoordinates(coordinates)
       }
     </div>
   )
