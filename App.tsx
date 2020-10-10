@@ -78,7 +78,7 @@ const GameInfo: React.FunctionComponent<{
   return(
     <div>
       <h1 className="game-name">Tick tack toe</h1>
-      <h2>{isGameWon(store) ? `Game won by "${store.currentPlayerMark}"` : ""}</h2>
+      <h2>{isGameWon(store) ? `Game won by "${store.currentPlayerMark === "o" ? "x" : "o"}"` : ""}</h2>
       <h4>{isGameLoading ? "Loading..." : ""}</h4>
       <p className="player-playing">{store.currentPlayerMark}</p>
     </div>
